@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.epicness.dualspatialgrid.Ball;
 import com.epicness.dualspatialgrid.PolyBall;
-import com.epicness.dualspatialgrid.dsg.DSGCircle;
 import com.epicness.dualspatialgrid.dsg.DSGObject;
 
 public class BallMover {
