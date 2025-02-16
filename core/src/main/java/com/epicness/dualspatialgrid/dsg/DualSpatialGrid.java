@@ -1,32 +1,21 @@
 package com.epicness.dualspatialgrid.dsg;
 
-import static com.badlogic.gdx.graphics.Color.BLUE;
-import static com.badlogic.gdx.graphics.Color.FOREST;
-import static com.badlogic.gdx.graphics.Color.SKY;
-
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.epicness.dualspatialgrid.utils.IndexedSet;
+import com.badlogic.gdx.utils.OrderedSet;
 
 public class DualSpatialGrid {
 
     private final SpatialGrid gridA, gridB;
+    public final Sizing sizing;
     private final float cellSize, halfCellSize;
-    private final IndexedSet<DSGObject> nearby;
+    private final OrderedSet<DSGObject> nearby;
 
-    public DualSpatialGrid(int cols, int rows, float cellSize, float xOffset, float yOffset, Sprite pixelSprite) {
-        this.cellSize = cellSize;
-        this.halfCellSize = cellSize / 2f;
-        gridA = new SpatialGrid(cols, rows, cellSize, xOffset, yOffset, pixelSprite, SKY, BLUE);
-        gridB = new SpatialGrid(cols + 1, rows + 1, cellSize, xOffset - halfCellSize, yOffset - halfCellSize,
-            pixelSprite, new Color(0f, 1f, 0f, 0.25f), FOREST);
-        nearby = new IndexedSet<>();
-    }
-
-    public void draw(SpriteBatch spriteBatch) {
-        gridA.draw(spriteBatch);
-        gridB.draw(spriteBatch);
+    public DualSpatialGrid(Sizing sizing) {
+        this.sizing = sizing;
+        this.cellSize = sizing.cellSize;
+        this.halfCellSize = cellSize * 0.5f;
+        gridA = new SpatialGrid(sizing);
+        gridB = new SpatialGrid(sizing.expandedCopy());
+        nearby = new OrderedSet<>();
     }
 
     public void clear() {
@@ -35,56 +24,52 @@ public class DualSpatialGrid {
     }
 
     public void insert(DSGObject dsgObject) {
-        float x = dsgObject.getCenterX();
-        float y = dsgObject.getCenterY();
-        float xA = x - gridA.xOffset;
-        float yA = y - gridA.yOffset;
-        float xB = x - gridB.xOffset;
-        float yB = y - gridB.yOffset;
-        float centerAx = ((int) (xA / cellSize)) * cellSize + halfCellSize;
-        float centerAy = ((int) (yA / cellSize)) * cellSize + halfCellSize;
-        float centerBx = ((int) (xB / cellSize)) * cellSize + halfCellSize;
-        float centerBy = ((int) (yB / cellSize)) * cellSize + halfCellSize;
+        float xA = dsgObject.getCenterX();
+        float yA = dsgObject.getCenterY();
+        float xB = xA - gridB.offset;
+        float yB = yA - gridB.offset;
+        int colA = (int) (xA / cellSize);
+        int rowA = (int) (yA / cellSize);
+        int colB = (int) (xB / cellSize);
+        int rowB = (int) (yB / cellSize);
+        float centerAx = colA * cellSize + halfCellSize;
+        float centerAy = rowA * cellSize + halfCellSize;
+        float centerBx = colB * cellSize + halfCellSize;
+        float centerBy = rowB * cellSize + halfCellSize;
 
         float distA = Math.abs(xA - centerAx) + Math.abs(yA - centerAy);
         float distB = Math.abs(xB - centerBx) + Math.abs(yB - centerBy);
 
-        int col, row;
-
         if (distA < distB) {
-            col = (int) (xA / cellSize);
-            row = (int) (yA / cellSize);
+            dsgObject.col = colA;
+            dsgObject.row = rowA;
             dsgObject.setGridA(true);
         } else {
-            col = (int) (xB / cellSize);
-            row = (int) (yB / cellSize);
+            dsgObject.col = colB;
+            dsgObject.row = rowB;
             dsgObject.setGridA(false);
         }
         gridA.insert(dsgObject);
         gridB.insert(dsgObject);
-        dsgObject.col = col;
-        dsgObject.row = row;
     }
 
-    public IndexedSet<DSGObject> getNearby(DSGObject dsgObject) {
+    public OrderedSet<DSGObject> getNearby(DSGObject dsgObject) {
         nearby.clear();
         SpatialGrid mainGrid = dsgObject.isGridA() ? gridA : gridB;
         SpatialGrid otherGrid = (mainGrid == gridA) ? gridB : gridA;
 
-        int col = (int) ((dsgObject.getCenterX() - mainGrid.xOffset) / cellSize);
-        int row = (int) ((dsgObject.getCenterY() - mainGrid.yOffset) / cellSize);
-
-        nearby.addAll(mainGrid.getDSGObjects(col, row));
+        int col = (int) ((dsgObject.getCenterX() - mainGrid.offset) / cellSize);
+        int row = (int) ((dsgObject.getCenterY() - mainGrid.offset) / cellSize);
 
         if (mainGrid == gridA) {
-            for (int c = col; c < col + 2 && c < otherGrid.cells.length; c++) {
-                for (int r = row; r < row + 2 && r < otherGrid.cells[c].length; r++) {
+            for (int c = col; c < col + 2; c++) {
+                for (int r = row; r < row + 2; r++) {
                     nearby.addAll(otherGrid.getDSGObjects(c, r));
                 }
             }
         } else {
-            for (int c = col; c > col - 2 && c >= 0 && c < otherGrid.cells.length; c--) {
-                for (int r = row; r > row - 2 && r >= 0 && r < otherGrid.cells[c].length; r--) {
+            for (int c = col; c > col - 2; c--) {
+                for (int r = row; r > row - 2; r--) {
                     nearby.addAll(otherGrid.getDSGObjects(c, r));
                 }
             }

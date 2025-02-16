@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="verlet" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.epicness.dualspatialgrid.lwjgl3.VerletLauncher" />
+    <module name="DualSpatialGrid.lwjgl3.main" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

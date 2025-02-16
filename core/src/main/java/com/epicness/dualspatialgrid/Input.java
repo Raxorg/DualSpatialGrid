@@ -2,7 +2,6 @@ package com.epicness.dualspatialgrid;
 
 import static com.badlogic.gdx.Input.Keys.E;
 import static com.badlogic.gdx.Input.Keys.Q;
-import static com.badlogic.gdx.Input.Keys.W;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -25,9 +24,6 @@ public class Input extends InputAdapter {
         switch (keycode) {
             case Q:
                 logic.spawnBalls();
-                break;
-            case W:
-                logic.spawnPolyBalls();
                 break;
             case E:
                 logic.collisionResolver.toggleIterations();
