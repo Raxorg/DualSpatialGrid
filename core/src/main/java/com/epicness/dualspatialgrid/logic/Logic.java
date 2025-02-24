@@ -1,5 +1,6 @@
 package com.epicness.dualspatialgrid.logic;
 
+import static com.badlogic.gdx.Input.Keys.R;
 import static com.badlogic.gdx.graphics.Color.SALMON;
 import static com.epicness.dualspatialgrid.Constants.BALL_SIZE;
 import static com.epicness.dualspatialgrid.Constants.EFFECTIVE_HEIGHT;
@@ -7,27 +8,37 @@ import static com.epicness.dualspatialgrid.Constants.EFFECTIVE_WIDTH;
 import static com.epicness.dualspatialgrid.Constants.GRID_X;
 import static com.epicness.dualspatialgrid.Constants.GRID_Y;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.epicness.dualspatialgrid.Ball;
 import com.epicness.dualspatialgrid.DualSpatialGridDemo;
+import com.epicness.dualspatialgrid.dsg.HasDSGObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Logic {
 
     public final BallMover ballMover;
     public final CollisionResolver collisionResolver;
+    public final DSGSolver dsgSolver;
 
     private final Sprite circle;
 
     private final Array<Ball> balls;
+    private final List<HasDSGObject> ballList;
 
+    private boolean useNewSolver;
 
     public Logic(DualSpatialGridDemo demo) {
         ballMover = new BallMover(demo.balls);
         collisionResolver = new CollisionResolver(demo.dualSpatialGrid, demo.balls);
+        dsgSolver = new DSGSolver(demo.dualSpatialGrid);
         circle = demo.circle;
         balls = demo.balls;
+        ballList = new ArrayList<>();
     }
 
     public void spawnBalls() {
@@ -46,6 +57,29 @@ public class Logic {
 
     public void update(float delta) {
         ballMover.moveBalls(delta);
-        collisionResolver.resolveAllCollisions();
+
+        if (Gdx.input.isKeyJustPressed(R)) {
+            useNewSolver = !useNewSolver;
+            System.out.println("SolveNewDSG " + useNewSolver);
+        }
+        if (useNewSolver) {
+            solveNewDSG();
+        } else {
+            collisionResolver.resolveAllCollisions();
+        }
+    }
+
+    private void solveNewDSG() {
+        ballList.clear();
+        for (int i = 0; i < balls.size; i++) {
+            ballList.add(balls.get(i));
+        }
+
+        for (int a = 0; a < 3; a++) {
+            dsgSolver.prepare(ballList);
+            for (int i = 0; i < balls.size; i++) {
+                dsgSolver.solveCollisions(ballList.get(i));
+            }
+        }
     }
 }

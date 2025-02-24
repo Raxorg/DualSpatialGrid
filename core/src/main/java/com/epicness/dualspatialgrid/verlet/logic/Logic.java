@@ -1,5 +1,6 @@
 package com.epicness.dualspatialgrid.verlet.logic;
 
+import com.epicness.dualspatialgrid.logic.DSGSolver;
 import com.epicness.dualspatialgrid.verlet.Stuff;
 
 public class Logic {
