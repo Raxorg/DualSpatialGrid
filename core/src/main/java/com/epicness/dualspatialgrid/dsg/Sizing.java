@@ -8,7 +8,7 @@ public class Sizing {
     public float offset;
     public float cellSize;
 
-    public Sizing(float offset, float cellSize) {
+    private Sizing(float offset, float cellSize) {
         this.offset = offset;
         this.cellSize = cellSize;
     }
@@ -17,7 +17,7 @@ public class Sizing {
         this(0, cellSize);
     }
 
-    public Sizing expandedCopy() {
+    public Sizing offsetCopy() {
         return new Sizing(offset - cellSize * 0.5f, cellSize);
     }
 }

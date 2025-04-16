@@ -14,7 +14,7 @@ public class DualSpatialGrid {
         this.cellSize = sizing.cellSize;
         this.halfCellSize = cellSize * 0.5f;
         gridA = new SpatialGrid(sizing);
-        gridB = new SpatialGrid(sizing.expandedCopy());
+        gridB = new SpatialGrid(sizing.offsetCopy());
         nearby = new OrderedSet<>();
     }
 
