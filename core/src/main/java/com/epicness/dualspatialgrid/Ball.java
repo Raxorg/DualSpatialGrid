@@ -1,7 +1,6 @@
 package com.epicness.dualspatialgrid;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.epicness.dualspatialgrid.dsg.DSGCircle;
@@ -17,8 +16,8 @@ public class Ball implements HasDSGObject {
         sprite.setSize(size, size);
         sprite.setColor(color);
 
-        circle = new DSGCircle(size / 2f);
-        circle.translate(size / 2f);
+        circle = new DSGCircle(size * 0.5f);
+        circle.translate(size * 0.5f);
         setTranslationListener(this::translate);
     }
 

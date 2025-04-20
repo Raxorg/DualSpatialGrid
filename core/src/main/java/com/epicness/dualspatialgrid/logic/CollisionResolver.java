@@ -59,7 +59,7 @@ public class CollisionResolver {
             if (dist > 0) {
                 float nx = dx / dist;
                 float ny = dy / dist;
-                float pushAmount = (a.kinematic || b.kinematic) ? overlap : overlap / 2f;
+                float pushAmount = (a.kinematic || b.kinematic) ? overlap : overlap * 0.5f;
                 if (!a.kinematic)
                     a.setPositionCentered(a.getCenterX() - nx * pushAmount, a.getCenterY() - ny * pushAmount);
                 if (!b.kinematic)
